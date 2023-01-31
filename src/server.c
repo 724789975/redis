@@ -1938,6 +1938,11 @@ void freeServerClientMemUsageBuckets() {
     server.client_mem_usage_buckets = NULL;
 }
 
+/**
+ * @brief 
+ * 
+ * 设置默认参数
+ */
 void initServerConfig(void) {
     int j;
     char *default_bindaddr[CONFIG_DEFAULT_BINDADDR_COUNT] = CONFIG_DEFAULT_BINDADDR;
@@ -2485,6 +2490,11 @@ void makeThreadKillable(void) {
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 }
 
+/**
+ * @brief 
+ * 
+ * 设置系统信号、字典、对象链表、公共对象、事件（文件，定时器）、6379服务器、持久化回调定时器
+ */
 void initServer(void) {
     int j;
 

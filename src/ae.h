@@ -112,6 +112,13 @@ typedef struct aeEventLoop {
 
 /* Prototypes */
 aeEventLoop *aeCreateEventLoop(int setsize);
+
+/**
+ * @brief 
+ * 
+ * 销毁事件循环，退出redis进程
+ * @param eventLoop 
+ */
 void aeDeleteEventLoop(aeEventLoop *eventLoop);
 void aeStop(aeEventLoop *eventLoop);
 int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,
@@ -125,6 +132,13 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
 int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);
 int aeProcessEvents(aeEventLoop *eventLoop, int flags);
 int aeWait(int fd, int mask, long long milliseconds);
+
+/**
+ * @brief 
+ * 
+ * 定时/网络读写事件多路复用监听
+ * @param eventLoop 
+ */
 void aeMain(aeEventLoop *eventLoop);
 char *aeGetApiName(void);
 void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep);

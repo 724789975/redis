@@ -38,20 +38,73 @@
 #define AE_OK 0
 #define AE_ERR -1
 
-#define AE_NONE 0       /* No events registered. */
-#define AE_READABLE 1   /* Fire when descriptor is readable. */
-#define AE_WRITABLE 2   /* Fire when descriptor is writable. */
-#define AE_BARRIER 4    /* With WRITABLE, never fire the event if the
-                           READABLE event already fired in the same event
-                           loop iteration. Useful when you want to persist
-                           things to disk before sending replies, and want
-                           to do that in a group fashion. */
+/**
+ * @brief 
+ * 
+ * No events registered.
+ * 事件类型 未注册
+ */
+#define AE_NONE 0
+/**
+ * @brief 
+ * 
+ * Fire when descriptor is readable.
+ * 事件类型 读
+ */
+#define AE_READABLE 1
+/**
+ * @brief 
+ * 
+ * Fire when descriptor is writable.
+ * 事件类型 写
+ */
+#define AE_WRITABLE 2
+/**
+ * @brief 
+ * 
+ * With WRITABLE, never fire the event if the
+ * READABLE event already fired in the same event
+ * loop iteration. Useful when you want to persist
+ * things to disk before sending replies, and want
+ * to do that in a group fashion.
+ */
+#define AE_BARRIER 4
 
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：网络
+ */
 #define AE_FILE_EVENTS (1<<0)
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：定时器
+ */
 #define AE_TIME_EVENTS (1<<1)
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：全部
+ */
 #define AE_ALL_EVENTS (AE_FILE_EVENTS|AE_TIME_EVENTS)
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：非阻塞标识（在select()时，设置timeout为0）
+ */
 #define AE_DONT_WAIT (1<<2)
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：sleep 之前调用
+ */
 #define AE_CALL_BEFORE_SLEEP (1<<3)
+/**
+ * @brief 
+ * 
+ * 监控的事件源的类型：sleep 之后调用
+ */
 #define AE_CALL_AFTER_SLEEP (1<<4)
 
 #define AE_NOMORE -1
@@ -68,7 +121,12 @@ typedef int aeTimeProc(struct aeEventLoop *eventLoop, long long id, void *client
 typedef void aeEventFinalizerProc(struct aeEventLoop *eventLoop, void *clientData);
 typedef void aeBeforeSleepProc(struct aeEventLoop *eventLoop);
 
-/* File event structure */
+/**
+ * @brief 
+ * 
+ * File event structure
+ * 客户都fd读写事件
+ */
 typedef struct aeFileEvent {
     int mask; /* one of AE_(READABLE|WRITABLE|BARRIER) */
     aeFileProc *rfileProc;
@@ -78,12 +136,54 @@ typedef struct aeFileEvent {
 
 /* Time event structure */
 typedef struct aeTimeEvent {
-    long long id; /* time event identifier. */
+	/**
+	 * @brief 
+	 * 
+	 * time event identifier.
+	 * 本定时器对象的id
+	 */
+    long long id;
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时器执行时间
+	 */
     monotime when;
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时回调函数
+	 */
     aeTimeProc *timeProc;
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时器销毁时，调用的清理函数
+	 */
     aeEventFinalizerProc *finalizerProc;
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时器回调函数参数
+	 */
     void *clientData;
+
+	/**
+	 * @brief 
+	 * 
+	 * 链表 上一个定时器
+	 */
     struct aeTimeEvent *prev;
+
+	/**
+	 * @brief 
+	 * 
+	 * 链表 下一个定时器
+	 */
     struct aeTimeEvent *next;
     int refcount; /* refcount to prevent timer events from being
   		   * freed in recursive time event calls. */
@@ -99,10 +199,28 @@ typedef struct aeFiredEvent {
 typedef struct aeEventLoop {
     int maxfd;   /* highest file descriptor currently registered */
     int setsize; /* max number of file descriptors tracked */
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时器事件id，自增，用于给新创建定时器编号
+	 */
     long long timeEventNextId;
     aeFileEvent *events; /* Registered events */
     aeFiredEvent *fired; /* Fired events */
+
+	/**
+	 * @brief 
+	 * 
+	 * 定时器事件的链表头
+	 */
     aeTimeEvent *timeEventHead;
+
+	/**
+	 * @brief 
+	 * 
+	 * 事件循环while退出条件
+	 */
     int stop;
     void *apidata; /* This is used for polling API specific data */
     aeBeforeSleepProc *beforesleep;
@@ -137,6 +255,10 @@ int aeWait(int fd, int mask, long long milliseconds);
  * @brief 
  * 
  * 定时/网络读写事件多路复用监听
+ * 调用后，遍历eventLoop下面挂载的网络事件链表、定时器链表。
+ * 使用定时器链表中最近的超市时间，作为select()的最后一个参数，去监听全部的客户端fd，
+ * 处理客户端事件后，查询定时器事件并处理。
+ * 继续while (!eventLoop->stop)循环，直到stop==true退出循环
  * @param eventLoop 
  */
 void aeMain(aeEventLoop *eventLoop);

@@ -36,20 +36,69 @@
 typedef struct listNode {
     struct listNode *prev;
     struct listNode *next;
+	/**
+	 * @brief 
+	 * 
+	 * 注意，但凡是void *的数据类型，必然是指向结构体地址
+	 */
     void *value;
 } listNode;
 
+/**
+ * @brief 
+ * 
+ * 链表迭代器（统一定义封装类型）
+ */
 typedef struct listIter {
     listNode *next;
     int direction;
 } listIter;
 
 typedef struct list {
+
+	/**
+	 * @brief 
+	 * 
+	 * 指向链表头
+	 */
     listNode *head;
+
+	/**
+	 * @brief 
+	 * 
+	 * 指向链表尾
+	 */
     listNode *tail;
+
+	/**
+	 * @brief 
+	 * 
+	 * 注意，dup复制字符串。返回值是void *。
+	 * 那么自然的就要联想到返回的是void * value，因为类型是一致的
+	 */
     void *(*dup)(void *ptr);
+
+	/**
+	 * @brief 
+	 * 
+	 * 释放链表节点的void * value
+	 */
     void (*free)(void *ptr);
+
+	/**
+	 * @brief 
+	 * 
+	 * 比较value，用于逻辑排序。
+	 * 程序中，比较字符串有两个目的：一个是排序（数学关系的大小），
+	 * 另外一个是逻辑排序（强行虚拟一个顺序出来，使对象在创建和销毁期间，具备一定的顺序性，方便调用）
+	 */
     int (*match)(void *ptr, void *key);
+
+	/**
+	 * @brief 
+	 * 
+	 * 链表的节点数量
+	 */
     unsigned long len;
 } list;
 

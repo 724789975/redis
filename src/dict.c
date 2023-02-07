@@ -60,6 +60,11 @@ static unsigned int dict_force_resize_ratio = 5;
 
 /* -------------------------- types ----------------------------------------- */
 
+/**
+ * @brief 
+ * 
+ * 字典中的元素
+ */
 struct dictEntry {
     void *key;
     union {

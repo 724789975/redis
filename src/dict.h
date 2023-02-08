@@ -48,6 +48,11 @@ typedef struct dictEntry dictEntry; /* opaque */
 
 typedef struct dict dict;
 
+/**
+ * @brief 
+ * 
+ * 字典目录
+ */
 typedef struct dictType {
     uint64_t (*hashFunction)(const void *key);
     void *(*keyDup)(dict *d, const void *key);
@@ -68,9 +73,20 @@ typedef struct dictType {
 #define DICTHT_SIZE(exp) ((exp) == -1 ? 0 : (unsigned long)1<<(exp))
 #define DICTHT_SIZE_MASK(exp) ((exp) == -1 ? 0 : (DICTHT_SIZE(exp))-1)
 
+/**
+ * @brief 
+ * 
+ * 字典
+ */
 struct dict {
     dictType *type;
 
+	/**
+	 * @brief 
+	 * 
+	 * 字典指针数组，每个数组是一条链表（一页词汇）。
+	 * 用数组是为了实现 cow?
+	 */
     dictEntry **ht_table[2];
     unsigned long ht_used[2];
 

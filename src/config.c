@@ -353,6 +353,13 @@ int yesnotoi(char *s) {
     else return -1;
 }
 
+/**
+ * @brief 
+ * 
+ * 持久化策略
+ * @param seconds 根据changes 超过这个时间 必然会写入磁盘
+ * @param changes 数据变化的数量
+ */
 void appendServerSaveParams(time_t seconds, int changes) {
     server.saveparams = zrealloc(server.saveparams,sizeof(struct saveparam)*(server.saveparamslen+1));
     server.saveparams[server.saveparamslen].seconds = seconds;

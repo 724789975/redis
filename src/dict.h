@@ -79,6 +79,12 @@ typedef struct dictType {
  * 字典
  */
 struct dict {
+
+	/**
+	 * @brief 
+	 * 
+	 * 字典目录，用于维护字典数据
+	 */
     dictType *type;
 
 	/**
@@ -101,10 +107,15 @@ struct dict {
                                  * by dictType's dictEntryBytes. */
 };
 
-/* If safe is set to 1 this is a safe iterator, that means, you can call
+/**
+ * @brief 
+ * 
+ * 字典迭代器
+ * If safe is set to 1 this is a safe iterator, that means, you can call
  * dictAdd, dictFind, and other functions against the dictionary even while
  * iterating. Otherwise it is a non safe iterator, and only dictNext()
- * should be called while iterating. */
+ * should be called while iterating.
+ */
 typedef struct dictIterator {
     dict *d;
     long index;

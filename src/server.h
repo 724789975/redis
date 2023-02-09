@@ -1519,7 +1519,14 @@ struct redisServer {
     pid_t child_pid;            /* PID of current child */
     int child_type;             /* Type of current child */
     /* Networking */
-    int port;                   /* TCP listening port */
+
+	/**
+	 * @brief 
+	 * 
+	 * TCP listening port
+	 * 6379服务端口，用于对外(client)提供api接口
+	 */
+    int port;
     int tls_port;               /* TLS listening port */
     int tcp_backlog;            /* TCP listen() backlog */
     char *bindaddr[CONFIG_BINDADDR_MAX]; /* Addresses we should bind to */
@@ -1639,8 +1646,22 @@ struct redisServer {
     long long stat_reply_buffer_expands; /* Total number of output buffer expands */
 
     /* Configuration */
-    int verbosity;                  /* Loglevel in redis.conf */
-    int maxidletime;                /* Client timeout in seconds */
+	   
+	/**
+	 * @brief 
+	 * 
+	 * Loglevel in redis.conf
+	 * 是否打印调试信息
+	 */
+    int verbosity;
+	
+	/**
+	* @brief
+	* 
+	* Client timeout in seconds
+	* 默认客户端timeout，此处是300s 
+	*/
+    int maxidletime;
     int tcpkeepalive;               /* Set SO_KEEPALIVE if non-zero. */
     int active_expire_enabled;      /* Can be disabled for testing purposes. */
     int active_expire_effort;       /* From 1 (default) to 10, active effort. */
@@ -1656,7 +1677,14 @@ struct redisServer {
     int active_defrag_cycle_max;       /* maximal effort for defrag in CPU percentage */
     unsigned long active_defrag_max_scan_fields; /* maximum number of fields of set/hash/zset/list to process from within the main dict scan */
     size_t client_max_querybuf_len; /* Limit for client query buffer length */
-    int dbnum;                      /* Total number of configured DBs */
+
+	/**
+	 * @brief 
+	 * 
+	 * Total number of configured DBs
+	 * 默认16本字典，argv[x]参数可以指定其它值
+	 */
+    int dbnum;
     int supervised;                 /* 1 if supervised, 0 otherwise. */
     int supervised_mode;            /* See SUPERVISED_* */
     int daemonize;                  /* True if running as a daemon */

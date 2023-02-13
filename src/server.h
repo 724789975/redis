@@ -1271,19 +1271,19 @@ struct sharedObjectsStruct {
 
 /* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-    sds ele;
-    double score;
-    struct zskiplistNode *backward;
+    sds ele;							// 数据
+    double score;						// 权重
+    struct zskiplistNode *backward;		// 后退指针，指向当前节点底层 前一个节点
     struct zskiplistLevel {
-        struct zskiplistNode *forward;
-        unsigned long span;
+        struct zskiplistNode *forward;	// 指向当前层的前一个节点
+        unsigned long span;				// forward 指向前一个节点的与当前节点的间距
     } level[];
 } zskiplistNode;
 
 typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
+    struct zskiplistNode *header, *tail;	// 分别指向头结点和尾结点
+    unsigned long length;				// 跳跃表总长度
+    int level;							// 跳跃表总高度
 } zskiplist;
 
 typedef struct zset {

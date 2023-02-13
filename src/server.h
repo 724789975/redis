@@ -1271,23 +1271,38 @@ struct sharedObjectsStruct {
 
 /* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-    sds ele;							// æ•°æ®
-    double score;						// æƒé‡
-    struct zskiplistNode *backward;		// åé€€æŒ‡é’ˆï¼ŒæŒ‡å‘å½“å‰èŠ‚ç‚¹åº•å±‚ å‰ä¸€ä¸ªèŠ‚ç‚¹
+    sds ele;							// Êı¾İ
+    double score;						// È¨ÖØ
+    struct zskiplistNode *backward;		// ºóÍËÖ¸Õë£¬Ö¸Ïòµ±Ç°½Úµãµ×²ã Ç°Ò»¸ö½Úµã
     struct zskiplistLevel {
-        struct zskiplistNode *forward;	// æŒ‡å‘å½“å‰å±‚çš„å‰ä¸€ä¸ªèŠ‚ç‚¹
-        unsigned long span;				// forward æŒ‡å‘å‰ä¸€ä¸ªèŠ‚ç‚¹çš„ä¸å½“å‰èŠ‚ç‚¹çš„é—´è·
+        struct zskiplistNode *forward;	// Ö¸Ïòµ±Ç°²ãµÄÇ°Ò»¸ö½Úµã
+
+		/**
+		 * forward Ö¸ÏòÇ°Ò»¸ö½ÚµãµÄÓëµ±Ç°½ÚµãµÄ¼ä¾à
+		 * ¿ç¶ÈÊµ¼ÊÉÏÊÇÓÃÀ´¼ÆËãÔªËØÅÅÃû(rank)µÄ£¬
+		 * ÔÚ²éÕÒÄ³¸ö½ÚµãµÄ¹ı³ÌÖĞ£¬½«ÑØÍ¾·Ã¹ıµÄËùÓĞ²ãµÄ¿ç¶ÈÀÛ»ıÆğÀ´£¬
+		 * µÃµ½µÄ½á¹û¾ÍÊÇÄ¿±ê½ÚµãÔÚÌøÔ¾±íÖĞµÄÅÅÎ»
+		 */
+        unsigned long span;
     } level[];
 } zskiplistNode;
 
 typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;	// åˆ†åˆ«æŒ‡å‘å¤´ç»“ç‚¹å’Œå°¾ç»“ç‚¹
-    unsigned long length;				// è·³è·ƒè¡¨æ€»é•¿åº¦
-    int level;							// è·³è·ƒè¡¨æ€»é«˜åº¦
+    struct zskiplistNode *header, *tail;	// ·Ö±ğÖ¸ÏòÍ·½áµãºÍÎ²½áµã
+    unsigned long length;				// ÌøÔ¾±í×Ü³¤¶È
+    int level;							// ÌøÔ¾±í×Ü¸ß¶È
 } zskiplist;
 
 typedef struct zset {
+	/*
+     * Redis »á½«ÌøÔ¾±íÖĞËùÓĞµÄÔªËØºÍ·ÖÖµ×é³É 
+     * key-value µÄĞÎÊ½±£´æÔÚ×ÖµäÖĞ
+     * todo£º×¢Òâ£º¸Ã×Öµä²¢²»ÊÇ Redis DB ÖĞµÄ×Öµä£¬Ö»ÊôÓÚÓĞĞò¼¯ºÏ
+     */
     dict *dict;
+	/*
+     * µ×²ãÖ¸ÏòµÄÌøÔ¾±íµÄÖ¸Õë
+     */
     zskiplist *zsl;
 } zset;
 
@@ -1524,7 +1539,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * TCP listening port
-	 * 6379æœåŠ¡ç«¯å£ï¼Œç”¨äºå¯¹å¤–(client)æä¾›apiæ¥å£
+	 * 6379·şÎñ??¿Ú£¬ÓÃÓÚ¶Ô???(client)Ìá¹©api½Ó¿Ú
 	 */
     int port;
     int tls_port;               /* TLS listening port */
@@ -1651,7 +1666,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * Loglevel in redis.conf
-	 * æ˜¯å¦æ‰“å°è°ƒè¯•ä¿¡æ¯
+	 * ??·ñ´òÓ¡µ÷ÊÔĞÅ??
 	 */
     int verbosity;
 	
@@ -1659,7 +1674,7 @@ struct redisServer {
 	* @brief
 	* 
 	* Client timeout in seconds
-	* é»˜è®¤å®¢æˆ·ç«¯timeoutï¼Œæ­¤å¤„æ˜¯300s 
+	* Ä¬??????»§¶Ëtimeout£¬??????ÊÇ300s 
 	*/
     int maxidletime;
     int tcpkeepalive;               /* Set SO_KEEPALIVE if non-zero. */
@@ -1682,7 +1697,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * Total number of configured DBs
-	 * é»˜è®¤16æœ¬å­—å…¸ï¼Œargv[x]å‚æ•°å¯ä»¥æŒ‡å®šå…¶å®ƒå€¼
+	 * Ä¬???16??×Öµä£¬argv[x]²ÎÊı??ÒÔÖ¸¶¨ÆäËü??
 	 */
     int dbnum;
     int supervised;                 /* 1 if supervised, 0 otherwise. */
@@ -2911,7 +2926,14 @@ typedef struct {
 #define ERROR_COMMAND_REJECTED (1<<0) /* Indicate to update the command rejected stats */
 #define ERROR_COMMAND_FAILED (1<<1) /* Indicate to update the command failed stats */
 
+/**
+ * @brief 
+ * 
+ * ?????????
+ * @return zskiplist* 
+ */
 zskiplist *zslCreate(void);
+
 void zslFree(zskiplist *zsl);
 zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele);
 unsigned char *zzlInsert(unsigned char *zl, sds ele, double score);

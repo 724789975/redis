@@ -1274,9 +1274,13 @@ typedef struct zskiplistNode {
     sds ele;							// 数据
     double score;						// 权重
     struct zskiplistNode *backward;		// 后退指针，指向当前节点底层 前一个节点
+	/**
+	 * @brief 
+	 * 
+	 * 与各层关系??
+	 */
     struct zskiplistLevel {
         struct zskiplistNode *forward;	// 指向当前层的前一个节点
-
 		/**
 		 * forward 指向前一个节点的与当前节点的间距
 		 * 跨度实际上是用来计算元素排名(rank)的，
@@ -1539,7 +1543,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * TCP listening port
-	 * 6379服务??口，用于对???(client)提供api接口
+	 * 6379服务端口，用于对外(client)提供api接口
 	 */
     int port;
     int tls_port;               /* TLS listening port */
@@ -1666,7 +1670,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * Loglevel in redis.conf
-	 * ??否打印调试信??
+	 * 是否打印调试信息
 	 */
     int verbosity;
 	
@@ -1674,7 +1678,7 @@ struct redisServer {
 	* @brief
 	* 
 	* Client timeout in seconds
-	* 默??????户端timeout，??????是300s 
+	* 默认客户端timeout，此处是300s 
 	*/
     int maxidletime;
     int tcpkeepalive;               /* Set SO_KEEPALIVE if non-zero. */
@@ -1697,7 +1701,7 @@ struct redisServer {
 	 * @brief 
 	 * 
 	 * Total number of configured DBs
-	 * 默???16??字典，argv[x]参数??以指定其它??
+	 * 默认16本字典，argv[x]参数可以指定其它值
 	 */
     int dbnum;
     int supervised;                 /* 1 if supervised, 0 otherwise. */
@@ -2929,7 +2933,7 @@ typedef struct {
 /**
  * @brief 
  * 
- * ?????????
+ * 创建跳跃表
  * @return zskiplist* 
  */
 zskiplist *zslCreate(void);

@@ -2939,6 +2939,20 @@ typedef struct {
 zskiplist *zslCreate(void);
 
 void zslFree(zskiplist *zsl);
+
+ /**
+  * @brief 
+  * 
+  * 插入节点总的来说一共四步
+  * 1.查找插入位置
+  * 2.调整高度
+  * 3.插入节点
+  * 4.调整backward
+  * @param zsl 
+  * @param score 
+  * @param ele 
+  * @return zskiplistNode* 
+  */
 zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele);
 unsigned char *zzlInsert(unsigned char *zl, sds ele, double score);
 int zslDelete(zskiplist *zsl, double score, sds ele, zskiplistNode **node);

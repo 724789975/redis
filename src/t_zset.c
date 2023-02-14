@@ -140,22 +140,9 @@ int zslRandomLevel(void) {
 }
 
  
- /**
-  * @brief 
-  * 
-  * 插入节点总的来说一共四步
-  * 1.查找插入位置
-  * 2.调整高度
-  * 3.插入节点
-  * 4.调整backward
-  * Insert a new node in the skiplist. Assumes the element does not already
-  * exist (up to the caller to enforce that). The skiplist takes ownership
-  * of the passed SDS string 'ele'.
-  * @param zsl 
-  * @param score 
-  * @param ele 
-  * @return zskiplistNode* 
-  */
+/* Insert a new node in the skiplist. Assumes the element does not already
+ * exist (up to the caller to enforce that). The skiplist takes ownership
+ * of the passed SDS string 'ele'.  */
 zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
     zskiplistNode *update[ZSKIPLIST_MAXLEVEL], *x;
     unsigned long rank[ZSKIPLIST_MAXLEVEL];

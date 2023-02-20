@@ -120,11 +120,11 @@ void zslFree(zskiplist *zsl) {
 /**
  * @brief 
  * 
- * åˆ›å»ºå’Œæ’å…¥èŠ‚ç‚¹çš„ä¹‹å‰ï¼Œ
- * å½“å‰èŠ‚ç‚¹éœ€è¦åœ¨å“ªå‡ å±‚å‡ºç°ï¼Œ
- * æ˜¯é€šè¿‡è®¡ç®—å½“å‰èŠ‚ç‚¹çš„levelå€¼ï¼Œ 
- * è€Œlevelå€¼æ˜¯redisé€šè¿‡ä¼ªéšæœºå¾—å‡ºçš„ï¼Œ
- * å±‚æ•°è¶Šé«˜ï¼ŒèŠ‚ç‚¹å‡ºç°çš„æ¦‚ç‡è¶Šå°ã€‚
+ * åˆ›å»ºå’Œæ’å…¥èŠ‚ç‚¹çš„ä¹‹å‰ï¼?
+ * å½“å‰èŠ‚ç‚¹éœ€è¦åœ¨å“?å‡ å±‚å‡ºç°ï¼?
+ * æ˜?é€šè¿‡è®¡ç®—å½“å‰èŠ‚ç‚¹çš„levelå€¼ï¼Œ 
+ * è€Œlevelå€¼æ˜¯redisé€šè¿‡ä¼?éšæœºå¾—å‡ºçš„ï¼Œ
+ * å±‚æ•°è¶Šé«˜ï¼ŒèŠ‚ç‚¹å‡ºç°çš„æ¦‚ç‡è¶Šå°ã€?
  * Returns a random level for the new skiplist node we are going to create.
  * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL
  * (both inclusive), with a powerlaw-alike distribution where higher
@@ -149,7 +149,7 @@ zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
     int i, level;
 
     serverAssert(!isnan(score));
-	//å¤´èŠ‚ç‚¹
+	//å¤´èŠ‚ç‚?
     x = zsl->header;
 	// æŸ¥æ‰¾èŠ‚ç‚¹
     for (i = zsl->level-1; i >= 0; i--) {
@@ -182,7 +182,7 @@ zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
     x = zslCreateNode(level,score,ele);
 	//æ’å…¥èŠ‚ç‚¹
     for (i = 0; i < level; i++) {
-		//å°±æ˜¯ä¸ªé“¾è¡¨ç»“æ„çš„æ’å…¥
+		//å°±æ˜¯ä¸?é“¾è¡¨ç»“æ„çš„æ’å…?
         x->level[i].forward = update[i]->level[i].forward;
         update[i]->level[i].forward = x;
 
@@ -211,20 +211,24 @@ void zslDeleteNode(zskiplist *zsl, zskiplistNode *x, zskiplistNode **update) {
     int i;
     for (i = 0; i < zsl->level; i++) {
         if (update[i]->level[i].forward == x) {
+			// update[i].level[i] µÄ forward ½ÚµãÊÇ x µÄÇé¿ö£¬ĞèÒª¸üĞÂ span ºÍ forward
             update[i]->level[i].span += x->level[i].span - 1;
             update[i]->level[i].forward = x->level[i].forward;
         } else {
+			// update[i].level[i] µÄ forward ½Úµã²»ÊÇ x µÄÇé¿ö£¬Ö»ĞèÒª¸üĞÂ span
             update[i]->level[i].span -= 1;
         }
     }
     if (x->level[0].forward) {
+		// Èç¹û x ²»ÊÇÎ²½Úµã£¬¸üĞÂ backward ½Úµã
         x->level[0].forward->backward = x->backward;
     } else {
+		// ·ñÔò ¸üĞÂÎ²½Úµã
         zsl->tail = x->backward;
     }
     while(zsl->level > 1 && zsl->header->level[zsl->level-1].forward == NULL)
-        zsl->level--;
-    zsl->length--;
+        zsl->level--; //¸üĞÂÌøÔ¾±í level
+    zsl->length--; // ¸üĞÂÌøÔ¾±í³¤¶È
 }
 
 /* Delete an element with matching score/element from the skiplist.

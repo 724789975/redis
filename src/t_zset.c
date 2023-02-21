@@ -120,11 +120,11 @@ void zslFree(zskiplist *zsl) {
 /**
  * @brief 
  * 
- * 鍒涘缓鍜屾彃鍏ヨ妭鐐圭殑涔嬪墠锛?
- * 褰撳墠鑺傜偣闇�瑕佸湪鍝?鍑犲眰鍑虹幇锛?
- * 鏄?閫氳繃璁＄畻褰撳墠鑺傜偣鐨刲evel鍊硷紝 
- * 鑰宭evel鍊兼槸redis閫氳繃浼?闅忔満寰楀嚭鐨勶紝
- * 灞傛暟瓒婇珮锛岃妭鐐瑰嚭鐜扮殑姒傜巼瓒婂皬銆?
+ * 创建和插入节点的之前，
+ * 当前节点需要在哪几层出现，
+ * 是通过计算当前节点的level值， 
+ * 而level值是redis通过伪随机得出的，
+ * 层数越高，节点出现的概率越小。
  * Returns a random level for the new skiplist node we are going to create.
  * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL
  * (both inclusive), with a powerlaw-alike distribution where higher
@@ -149,9 +149,9 @@ zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
     int i, level;
 
     serverAssert(!isnan(score));
-	//澶磋妭鐐?
+	//头节点
     x = zsl->header;
-	// 鏌ユ壘鑺傜偣
+	// 查找节点
     for (i = zsl->level-1; i >= 0; i--) {
         /* store rank that is crossed to reach the insert position */
         rank[i] = i == (zsl->level-1) ? 0 : rank[i+1];
@@ -169,7 +169,7 @@ zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
      * scores, reinserting the same element should never happen since the
      * caller of zslInsert() should test in the hash table if the element is
      * already inside or not. */
-	//璋冩暣楂樺害
+	//调整高度
     level = zslRandomLevel();
     if (level > zsl->level) {
         for (i = zsl->level; i < level; i++) {
@@ -180,9 +180,9 @@ zskiplistNode *zslInsert(zskiplist *zsl, double score, sds ele) {
         zsl->level = level;
     }
     x = zslCreateNode(level,score,ele);
-	//鎻掑叆鑺傜偣
+	//插入节点
     for (i = 0; i < level; i++) {
-		//灏辨槸涓?閾捐〃缁撴瀯鐨勬彃鍏?
+		//就是个链表结构的插入
         x->level[i].forward = update[i]->level[i].forward;
         update[i]->level[i].forward = x;
 

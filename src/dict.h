@@ -51,7 +51,7 @@ typedef struct dict dict;
 /**
  * @brief 
  * 
- * å­—å…¸ç›®å½•
+ * ×ÖµäÄ¿Â¼
  */
 typedef struct dictType {
     uint64_t (*hashFunction)(const void *key);
@@ -76,31 +76,41 @@ typedef struct dictType {
 /**
  * @brief 
  * 
- * å­—å…¸
+ * ×Öµä
  */
 struct dict {
 
 	/**
 	 * @brief 
 	 * 
-	 * å­—å…¸ç›®å½•ï¼Œç”¨äºç»´æŠ¤å­—å…¸æ•°æ®
+	 * ×ÖµäÄ¿Â¼£¬ÓÃÓÚÎ¬»¤×ÖµäÊı¾İ
 	 */
     dictType *type;
 
 	/**
 	 * @brief 
 	 * 
-	 * å­—å…¸æŒ‡é’ˆæ•°ç»„ï¼Œæ¯ä¸ªæ•°ç»„æ˜¯ä¸€æ¡é“¾è¡¨ï¼ˆä¸€é¡µè¯æ±‡ï¼‰ã€‚
-	 * ç”¨æ•°ç»„æ˜¯ä¸ºäº†å®ç° cow?
+	 * ×ÖµäÖ¸ÕëÊı×é£¬Ã¿¸öÊı×éÊÇÒ»ÌõÁ´±í£¨Ò»Ò³´Ê»ã£©¡£
 	 */
     dictEntry **ht_table[2];
     unsigned long ht_used[2];
 
-    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+	/**
+	 * @brief 
+	 * -1´ú±íÃ»ÓĞ½øĞĞrehashÖµ£¬·ñÔò´ú±íhash²Ù×÷½øĞĞµ½ÁËÄÄ¸öË÷Òı
+	 * rehashing not in progress if rehashidx == -1
+	 */
+    long rehashidx;
 
     /* Keep small vars at end for optimal (minimal) struct padding */
     int16_t pauserehash; /* If >0 rehashing is paused (<0 indicates coding error) */
-    signed char ht_size_exp[2]; /* exponent of size. (size = 1<<exp) */
+	/**
+	 * @brief 
+	 * ¹şÏ£±íµÄ´óĞ¡Îª1 << ht_size_exp[idx]
+	 * size = 1 << ht_size_exp[idx]
+	 * exponent of size. (size = 1<<exp) 
+	 */
+    signed char ht_size_exp[2];
 
     void *metadata[];           /* An arbitrary number of bytes (starting at a
                                  * pointer-aligned address) of size as defined
@@ -110,7 +120,7 @@ struct dict {
 /**
  * @brief 
  * 
- * å­—å…¸è¿­ä»£å™¨
+ * ×Öµäµü´úÆ÷
  * If safe is set to 1 this is a safe iterator, that means, you can call
  * dictAdd, dictFind, and other functions against the dictionary even while
  * iterating. Otherwise it is a non safe iterator, and only dictNext()
@@ -152,6 +162,10 @@ typedef void *(dictDefragAllocFunction)(void *ptr);
 #define dictMetadataSize(d) ((d)->type->dictMetadataBytes               \
                              ? (d)->type->dictMetadataBytes() : 0)
 
+/**
+ * @brief 
+ * ¸ù¾İ×ÖµäµÄhashº¯ÊıµÃµ½keyµÄhashÖµ
+ */
 #define dictHashKey(d, key) ((d)->type->hashFunction(key))
 #define dictSlots(d) (DICTHT_SIZE((d)->ht_size_exp[0])+DICTHT_SIZE((d)->ht_size_exp[1]))
 #define dictSize(d) ((d)->ht_used[0]+(d)->ht_used[1])
@@ -222,7 +236,19 @@ uint64_t dictGenHashFunction(const void *key, size_t len);
 uint64_t dictGenCaseHashFunction(const unsigned char *buf, size_t len);
 void dictEmpty(dict *d, void(callback)(dict*));
 void dictSetResizeEnabled(dictResizeEnable enable);
+
+/**
+ * redisÖĞµÄkey¿ÉÄÜÓĞ³ÉÇ§ÉÏÍò£¬Èç¹ûÒ»´ÎĞÔÀ©Èİ£¬»á¶ÔĞÔÄÜÔì³É¾Ş´óµÄÓ°Ïì£¬
+ * ËùÒÔredisÊ¹ÓÃ½¥½øÊ½À©Èİ£¬Ã¿´ÎÖ´ĞĞ²åÈë£¬É¾³ı£¬²éÕÒ£¬ĞŞ¸ÄµÈ²Ù×÷Ç°£¬¶¼ÏÈÅĞ¶Ïµ±Ç°×ÖµäµÄrehash²Ù×÷ÊÇ·ñÔÚ½øĞĞ£¬
+ * Èç¹ûÊÇÔÚ½øĞĞÖĞ£¬¾Í¶Ôµ±Ç°½Úµã½øĞĞrehash²Ù×÷£¬Ö»Ö´ĞĞÒ»´Î¡£
+ * ³ı´ËÖ®Íâ£¬
+ * µ±·şÎñÆ÷¿ÕÏĞÊ±£¬
+ * Ò²»áµ÷ÓÃincrementallyRehashº¯Êı½øĞĞÅúÁ¿²Ù×÷£¬
+ * Ã¿´Î100¸ö½Úµã£¬´ó¸ÅÒ»ºÁÃë¡£
+ * ½«rehash²Ù×÷½øĞĞ·Ö¶øÖÎÖ®¡£
+ */
 int dictRehash(dict *d, int n);
+
 int dictRehashMilliseconds(dict *d, int ms);
 void dictSetHashFunctionSeed(uint8_t *seed);
 uint8_t *dictGetHashFunctionSeed(void);

@@ -193,6 +193,15 @@ rax *raxNew(void);
 int raxInsert(rax *rax, unsigned char *s, size_t len, void *data, void **old);
 int raxTryInsert(rax *rax, unsigned char *s, size_t len, void *data, void **old);
 int raxRemove(rax *rax, unsigned char *s, size_t len, void **old);
+
+/**
+ * @brief 
+ * 根据key获取对应的value
+ * @param rax 待查找的rax
+ * @param s 待查找的key
+ * @param len s的长度
+ * @return void* 
+ */
 void *raxFind(rax *rax, unsigned char *s, size_t len);
 void raxFree(rax *rax);
 void raxFreeWithCallback(rax *rax, void (*free_callback)(void*));

@@ -595,6 +595,7 @@ int raxGenericInsert(rax *rax, unsigned char *s, size_t len, void *data, void **
 	raxNode *h, **parentlink;
 
 	debugf("### Insert %.*s with value %p\n", (int)len, s, data);
+	// 查找key是否存在
 	i = raxLowWalk(rax, s, len, &h, &parentlink, &j, NULL);
 
 	/* If i == len we walked following the whole string. If we are not
@@ -606,6 +607,7 @@ int raxGenericInsert(rax *rax, unsigned char *s, size_t len, void *data, void **
 	{
 		debugf("### Insert: node representing key exists\n");
 		/* Make space for the value pointer if needed. */
+		// 如果之前节点没有数据，就分配一个空间
 		if (!h->iskey || (h->isnull && overwrite))
 		{
 			h = raxReallocForData(h, data);
@@ -619,6 +621,7 @@ int raxGenericInsert(rax *rax, unsigned char *s, size_t len, void *data, void **
 		}
 
 		/* Update the existing key if there is already one. */
+		// 更新数据
 		if (h->iskey)
 		{
 			if (old)

@@ -1272,6 +1272,7 @@ void streamIteratorGetField(streamIterator *si, unsigned char **fieldptr, unsign
  * automatically re-seek to the next entry, so the caller should continue
  * with GetID(). */
 void streamIteratorRemoveEntry(streamIterator *si, streamID *current) {
+	// 当前消息所在的listpack
     unsigned char *lp = si->lp;
     int64_t aux;
 
@@ -1279,28 +1280,36 @@ void streamIteratorRemoveEntry(streamIterator *si, streamID *current) {
      * deleted by flagging it, and also incrementing the count of the
      * deleted entries in the listpack header.
      *
-     * We start flagging: */
+     * We start flagging:
+	 * // 标记删除位 */
     int64_t flags = lpGetInteger(si->lp_flags);
     flags |= STREAM_ITEM_FLAG_DELETED;
     lp = lpReplaceInteger(lp,&si->lp_flags,flags);
 
     /* Change the valid/deleted entries count in the master entry. */
+	/* 修改有效的消息数量*/
     unsigned char *p = lpFirst(lp);
     aux = lpGetInteger(p);
 
     if (aux == 1) {
         /* If this is the last element in the listpack, we can remove the whole
-         * node. */
+         * node.
+		 * 如果只有待删除的消息，就直接释放listpack */
         lpFree(lp);
         raxRemove(si->stream->rax,si->ri.key,si->ri.key_len,NULL);
     } else {
-        /* In the base case we alter the counters of valid/deleted entries. */
+        /* In the base case we alter the counters of valid/deleted entries.
+		 * 更新统计信息 */
         lp = lpReplaceInteger(lp,&p,aux-1);
-        p = lpNext(lp,p); /* Seek deleted field. */
+
+		/* Seek deleted field. */
+		/* 查找删除节点p */
+        p = lpNext(lp,p);
         aux = lpGetInteger(p);
         lp = lpReplaceInteger(lp,&p,aux+1);
 
-        /* Update the listpack with the new pointer. */
+        /* Update the listpack with the new pointer.
+		 * 更新listpack指针，可能因为扩容缩容而变化 */
         if (si->lp != lp)
             raxInsert(si->stream->rax,si->ri.key,si->ri.key_len,lp,NULL);
     }
@@ -2476,15 +2485,21 @@ void streamFreeConsumer(streamConsumer *sc) {
  * the same name already exists NULL is returned, otherwise the pointer to the
  * consumer group is returned. */
 streamCG *streamCreateCG(stream *s, char *name, size_t namelen, streamID *id, long long entries_read) {
+	 //当前消息流没有消费组，就新建一个
     if (s->cgroups == NULL) s->cgroups = raxNew();
+
+	// 查找是否有重名消费组，有就直接返回
     if (raxFind(s->cgroups,(unsigned char*)name,namelen) != raxNotFound)
         return NULL;
 
+	// 新建消费组
     streamCG *cg = zmalloc(sizeof(*cg));
     cg->pel = raxNew();
     cg->consumers = raxNew();
     cg->last_id = *id;
     cg->entries_read = entries_read;
+
+	// 将消费组插入到消费组树中
     raxInsert(s->cgroups,(unsigned char*)name,namelen,cg,NULL);
     return cg;
 }
@@ -2531,6 +2546,7 @@ streamConsumer *streamCreateConsumer(streamCG *cg, sds name, robj *key, int dbid
 
 /* Lookup the consumer with the specified name in the group 'cg'. */
 streamConsumer *streamLookupConsumer(streamCG *cg, sds name) {
+	// 在消费者的rax中查找指定的消费者
     if (cg == NULL) return NULL;
     streamConsumer *consumer = raxFind(cg->consumers,(unsigned char*)name,
                                        sdslen(name));

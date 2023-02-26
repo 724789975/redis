@@ -190,8 +190,12 @@ extern void *raxNotFound;
 
 /* Exported API. */
 rax *raxNew(void);
+
+//向rax中添加key-value对 覆盖原有key
 int raxInsert(rax *rax, unsigned char *s, size_t len, void *data, void **old);
+//向rax中添加key-value对 不覆盖原有key
 int raxTryInsert(rax *rax, unsigned char *s, size_t len, void *data, void **old);
+
 int raxRemove(rax *rax, unsigned char *s, size_t len, void **old);
 
 /**
